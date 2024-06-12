@@ -15,10 +15,10 @@ jobs:
           memory: 4096m
 
       - name: Install Strimzi
-        run: kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n console-namespace
+        run: kubectl create -f 'https://strimzi.io/install/latest?namespace=console-namespace' --namespace=console-namespace
 
       - name: Create Kafka
-        run: kubectl apply -f https://strimzi.io/examples/latest/kafka/kraft/kafka-single-node.yaml -n console-namespace
+        run: kubectl apply -f https://strimzi.io/examples/latest/kafka/kraft/kafka-single-node.yaml --namespace=console-namespace
 
       - name: Wait for Kafka
-        run: kubectl wait kafka/my-cluster --for=condition=Ready --timeout=300s -n console-namespace
+        run: kubectl wait kafka/my-cluster --for=condition=Ready --timeout=300s --namespace=console-namespace
