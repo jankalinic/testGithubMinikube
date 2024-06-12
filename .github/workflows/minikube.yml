@@ -16,7 +16,7 @@ jobs:
 
       - name: Install yq
         run: |
-          curl -L https://github.com/mikefarah/yq/releases/download/v4.2.1/yq_linux_amd64 > yq && chmod +x yq
+          curl -L https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64 > yq && chmod +x yq
           sudo cp -v yq /usr/bin/
 
       - name: Start minikube
@@ -69,6 +69,9 @@ jobs:
 
       - name: Wait for Kafka
         run: kubectl wait kafka/console-kafka --for=condition=Ready --timeout=300s -n $TARGET_NAMESPACE
+
+      - name: Show pods
+        run: kubectl get pods -n $TARGET_NAMESPACE
 
       - name: Console deployment
         shell: bash
