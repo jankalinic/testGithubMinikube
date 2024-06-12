@@ -1,7 +1,15 @@
+name: Greeting on variable day
+
 on:
   pull_request:
     branches:
       - main
+
+env:
+  INSTALL_DIR: "./install/"
+  TARGET_NAMESPACE: console-namespace
+  CLUSTER_DOMAIN: ""
+  CONSOLE_CONFIG: ""
 
 jobs:
   test_pr:
@@ -15,14 +23,35 @@ jobs:
           cpus: 4
           memory: 4096m
 
+      - name: Enable ingress
+        run: minikube addons enable ingress && minikube addons enable ingress-dns
+
+      - name: Enable ingress
+        run: minikube ip
+
+      - name: Enable ingress
+        run: minikube ip
+
       - name: Create namespace
-        run: kubectl create namespace console-namespace
+        run: kubectl create namespace $TARGET_NAMESPACE
 
       - name: Install Strimzi
-        run: kubectl create -f 'https://strimzi.io/install/latest?namespace=console-namespace' --namespace=console-namespace
+        run: kubectl create -f 'https://strimzi.io/install/latest?namespace=$TARGET_NAMESPACE' --namespace=$TARGET_NAMESPACE
 
-      - name: Create Kafka
-        run: kubectl apply -f https://strimzi.io/examples/latest/kafka/kraft/kafka-single-node.yaml --namespace=console-namespace
+      - name: Show pods
+        run: kubectl get pods --namespace=$TARGET_NAMESPACE
+
+      - name: Console installation
+        shell: bash
+        run: |
+          cd $INSTALL_DIR
+          ./000-install-dependency-operators.sh $TARGET_NAMESPACE
+          ./001-deploy-prometheus.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN
+          ./002-deploy-console-kafka.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN zk
+          ./003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN $CONSOLE_CONFIG
 
       - name: Wait for Kafka
-        run: kubectl wait kafka/my-cluster --for=condition=Ready --timeout=300s --namespace=console-namespace
+        run: kubectl wait kafka/my-cluster --for=condition=Ready --timeout=300s --namespace=$TARGET_NAMESPACE
+
+      - name: Show pods
+        run: kubectl get pods --namespace=$TARGET_NAMESPACE
