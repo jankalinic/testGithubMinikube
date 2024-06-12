@@ -15,8 +15,6 @@ if [ "$(${KUBE} api-resources --api-group=route.openshift.io -o=name 2>/dev/null
     export CLUSTER_DOMAIN="${2?Please provide the base domain name for console ingress}"
 fi
 
-PROVIDED_APIS="$(${KUBE} get operatorgroup -n ${NAMESPACE} -o json | jq -r '.items[].metadata.annotations["olm.providedAPIs"]' | tr '[:upper:]' '[:lower:]')"
-
 if ! ${KUBE} get crd kafkas.kafka.strimzi.io 1>/dev/null 2>&1 ; then
     echo -e "${ERROR} Strimzi Kafka Operator custom resource(s) not found"
     display_suggested_subscription "strimzi-kafka-operator" "strimzi-kafka-operator|amq-streams"
