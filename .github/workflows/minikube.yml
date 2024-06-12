@@ -7,11 +7,23 @@ on:
 
 env:
   TARGET_NAMESPACE: console-namespace
-
 jobs:
   test_pr:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install yq
+        run: |
+          curl -L https://github.com/mikefarah/yq/releases/download/v4.2.1/yq_linux_amd64 > yq && chmod +x yq
+          sudo cp -v yq /usr/bin/
+
+      - name: Show dir
+        run: pwd
+
+      - name: Show files
+        run: ls
 
       - name: Start minikube
         id: minikube
