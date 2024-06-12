@@ -53,9 +53,15 @@ jobs:
       - name: Prometheus get crds
         run: kubectl get crd prometheuses.monitoring.coreos.com
 
+      - name: Show pods
+        run: kubectl get pods -n $TARGET_NAMESPACE
+
+      - name: Show deployments
+        run: kubectl get deployments -n $TARGET_NAMESPACE
+
       - name: Prometheus deployment
         shell: bash
-        run: ./install/001-deploy-prometheus.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN
+        run: ./install/001-deploy-prometheus.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN ci
 
       - name: Kafka deployment
         shell: bash
