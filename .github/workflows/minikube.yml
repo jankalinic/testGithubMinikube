@@ -41,6 +41,15 @@ jobs:
       - name: Install Strimzi
         run: kubectl create -f https://strimzi.io/install/latest?namespace=$TARGET_NAMESPACE -n $TARGET_NAMESPACE
 
+      - name: Show pods
+        run: kubectl get pods -n $TARGET_NAMESPACE
+
+      - name: Show sleep
+        run: sleep 20
+
+      - name: Show deployments
+        run: kubectl get deployments -n $TARGET_NAMESPACE
+
       - name: Wait for Strimzi
         run: kubectl wait deployment/strimzi-cluster-operator --for=condition=Ready --timeout=300s -n $TARGET_NAMESPACE
 
