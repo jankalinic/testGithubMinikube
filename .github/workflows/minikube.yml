@@ -44,25 +44,25 @@ jobs:
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
 
-      - name: Show dir
-        run: pwd
-
-      - name: Show files
-        run: ls
-
-      - name: Console installation
+      - name: Prometheus deployment
         shell: bash
-        run: |
-          cd ./install/
-          ./001-deploy-prometheus.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN
-          ./002-deploy-console-kafka.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN zk
-          
-          sed -i 's#""#"$(kubectl get secret console-user -o yaml | yq '.data.password' - | base64 --decode)"#g' $INSTALL_DIR/resources/console/console-config.yaml
-          
-          ./003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN $INSTALL_DIR/resources/console/console-config.yaml
+        run: ./install/001-deploy-prometheus.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN
+
+      - name: Kafka deployment
+        shell: bash
+        run: ./002-deploy-console-kafka.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN zk
 
       - name: Wait for Kafka
-        run: kubectl wait kafka/my-cluster --for=condition=Ready --timeout=300s -n $TARGET_NAMESPACE
+        run: kubectl wait kafka/console-kafka --for=condition=Ready --timeout=300s -n $TARGET_NAMESPACE
+
+      - name: Console deployment
+        shell: bash
+        run: | 
+            sed -i 's#$USER_PASSWORD#"$(kubectl get secret console-user -o yaml | yq '.data.password' - | base64 --decode)"#g' ./install/resources/console/console-config.yaml
+            sed -i 's#$CLUSTER_DOMAIN#"$TARGET_NAMESPACE"#g' ./install/resources/console/console-config.yaml
+            sed -i 's#$NAMESPACE#"$CLUSTER_DOMAIN"#g' ./install/resources/console/console-config.yaml
+            cat ./install/resources/console/console-config.yaml
+            ./003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN ./install/resources/console/console-config.yaml
 
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
