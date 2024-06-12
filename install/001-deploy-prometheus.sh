@@ -4,7 +4,7 @@ set -euo pipefail
 
 CONSOLE_INSTALL_PATH="$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P)"
 RESOURCE_PATH=${CONSOLE_INSTALL_PATH}/resources
-
+echo -e "${RESOURCE_PATH}"
 export NAMESPACE="${1?Please provide the deployment namespace}"
 export CLUSTER_DOMAIN="${2:-}"
 export CI_CLUSTER="${3:-}"
@@ -20,7 +20,7 @@ fi
 echo -e "${INFO} Apply Prometheus security resources"
 ${KUBE} apply -n ${NAMESPACE} -f ${RESOURCE_PATH}/prometheus/console-prometheus-server.clusterrole.yaml
 ${KUBE} apply -n ${NAMESPACE} -f ${RESOURCE_PATH}/prometheus/console-prometheus-server.serviceaccount.yaml
-${YQ} eval '.subjects[0].namespace = strenv(NAMESPACE)' ${RESOURCE_PATH}/prometheus/console-prometheus-server.clusterrolebinding.yaml | ${KUBE} apply -n ${NAMESPACE} -f -
+${YQ} '.subjects[0].namespace = strenv(NAMESPACE)' ${RESOURCE_PATH}/prometheus/console-prometheus-server.clusterrolebinding.yaml | ${KUBE} apply -n ${NAMESPACE} -f -
 
 echo -e "${INFO} Apply Prometheus PodMonitor and Kubernetes scrape configurations"
 ${KUBE} apply -n ${NAMESPACE} -f ${RESOURCE_PATH}/prometheus/kafka-resources.podmonitor.yaml
