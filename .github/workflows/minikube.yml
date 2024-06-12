@@ -91,16 +91,20 @@ jobs:
         run: kubectl get deployments -n $TARGET_NAMESPACE
 
       - name: Wait for user secret
-        run: while ! kubectl get secret console-kafka-user1 -n $TARGET_NAMESPACE; do echo "Waiting for user secret"; sleep 2; done
+        run: while ! kubectl get secret console-kafka-user1 -n $TARGET_NAMESPACE; do echo "Waiting for user secret"; sleep 5; done
+
+      - name: build images
+        run: make container-images
+
 
       - name: Console deployment
         shell: bash
         run: | 
             USERPS=$(kubectl get secret console-kafka-user1 -n $TARGET_NAMESPACE -o yaml | yq '.data.password' - | base64 --decode)
             echo ${USERPS}
-            sed -i 's#$USER_PASSWORD#"${USERPS}"#g' $CONFIG_YAML
-            sed -i 's#$CLUSTER_DOMAIN#${CLUSTER_DOMAIN}#g' $CONFIG_YAML
-            sed -i 's#$NAMESPACE#${TARGET_NAMESPACE}#g' $CONFIG_YAML
+            sed -i "s#\$USER_PASSWORD#\"${USERPS}\"#g" $CONFIG_YAML
+            sed -i "s#\$CLUSTER_DOMAIN#${CLUSTER_DOMAIN}#g" $CONFIG_YAML
+            sed -i "s#\$NAMESPACE#${TARGET_NAMESPACE}#g" $CONFIG_YAML
             cat $CONFIG_YAML
             ./install/003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN $CONFIG_YAML
 
