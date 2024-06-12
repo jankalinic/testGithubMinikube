@@ -8,6 +8,7 @@ on:
 env:
   TARGET_NAMESPACE: console-namespace
   CI_CLUSTER: true
+  CONFIG_YAML: ./install/resources/console/console-config.yaml
 jobs:
   test_pr:
     runs-on: ubuntu-latest
@@ -59,7 +60,7 @@ jobs:
 
       - name: Prometheus deployment
         shell: bash
-        run: ./install/001-deploy-prometheus.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN ci
+        run: ./install/001-deploy-prometheus.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN
 
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
@@ -70,6 +71,10 @@ jobs:
       - name: Kafka deployment
         shell: bash
         run: ./install/002-deploy-console-kafka.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN zk
+
+      - name: Sleep
+        run: sleep 20
+
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
 
@@ -88,11 +93,11 @@ jobs:
       - name: Console deployment
         shell: bash
         run: | 
-            sed -i 's#$USER_PASSWORD#"$(kubectl get secret console-user -o yaml | yq '.data.password' - | base64 --decode)"#g' ./install/resources/console/console-config.yaml
-            sed -i 's#$CLUSTER_DOMAIN#"$TARGET_NAMESPACE"#g' ./install/resources/console/console-config.yaml
-            sed -i 's#$NAMESPACE#"$CLUSTER_DOMAIN"#g' ./install/resources/console/console-config.yaml
-            cat ./install/resources/console/console-config.yaml
-            ./install/003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN ./install/resources/console/console-config.yaml
+            sed -i 's#$USER_PASSWORD#"$(kubectl get secret console-user -o yaml | yq '.data.password' - | base64 --decode)"#g' $CONFIG_YAML
+            sed -i 's#$CLUSTER_DOMAIN#"$TARGET_NAMESPACE"#g' $CONFIG_YAML
+            sed -i 's#$NAMESPACE#"$CLUSTER_DOMAIN"#g' $CONFIG_YAML
+            cat $CONFIG_YAML
+            ./install/003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN $CONFIG_YAML
 
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
