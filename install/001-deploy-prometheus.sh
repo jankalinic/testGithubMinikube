@@ -7,7 +7,6 @@ RESOURCE_PATH=${CONSOLE_INSTALL_PATH}/resources
 echo -e "${RESOURCE_PATH}"
 export NAMESPACE="${1?Please provide the deployment namespace}"
 export CLUSTER_DOMAIN="${2:-}"
-export CI_CLUSTER="${3:-}"
 source ${CONSOLE_INSTALL_PATH}/_common.sh
 
 if ! ${KUBE} get crd prometheuses.monitoring.coreos.com >/dev/null ; then

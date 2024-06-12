@@ -7,6 +7,7 @@ on:
 
 env:
   TARGET_NAMESPACE: console-namespace
+  CI_CLUSTER: true
 jobs:
   test_pr:
     runs-on: ubuntu-latest

@@ -32,7 +32,8 @@ else
     fi
 fi
 
-CI_CLUSTER="${CI_CLUSTER:-}"
+echo -e "ci_cluster: ${CI_CLUSTER}"
+
 OLM=$(kubectl get crd | grep operators.coreos.com) || :
 
 if [ "${OLM}" == "" ] && [ "${CI_CLUSTER}" == "" ] ; then
