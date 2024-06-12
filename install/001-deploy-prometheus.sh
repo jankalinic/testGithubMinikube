@@ -20,7 +20,7 @@ fi
 echo -e "${INFO} Apply Prometheus security resources"
 ${KUBE} apply -n ${NAMESPACE} -f ${RESOURCE_PATH}/prometheus/console-prometheus-server.clusterrole.yaml
 ${KUBE} apply -n ${NAMESPACE} -f ${RESOURCE_PATH}/prometheus/console-prometheus-server.serviceaccount.yaml
-yq '.subjects[0].namespace = strenv(NAMESPACE)' ${RESOURCE_PATH}/prometheus/console-prometheus-server.clusterrolebinding.yaml | ${KUBE} apply -n ${NAMESPACE} -f -
+${YQ} eval '.subjects[0].namespace = strenv(NAMESPACE)' ${RESOURCE_PATH}/prometheus/console-prometheus-server.clusterrolebinding.yaml | ${KUBE} apply -n ${NAMESPACE} -f -
 
 echo -e "${INFO} Apply Prometheus PodMonitor and Kubernetes scrape configurations"
 ${KUBE} apply -n ${NAMESPACE} -f ${RESOURCE_PATH}/prometheus/kafka-resources.podmonitor.yaml
