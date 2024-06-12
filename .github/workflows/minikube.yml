@@ -19,12 +19,6 @@ jobs:
           curl -L https://github.com/mikefarah/yq/releases/download/v4.2.1/yq_linux_amd64 > yq && chmod +x yq
           sudo cp -v yq /usr/bin/
 
-      - name: Show dir
-        run: pwd
-
-      - name: Show files
-        run: ls
-
       - name: Start minikube
         id: minikube
         uses: medyagh/setup-minikube@latest
@@ -35,10 +29,10 @@ jobs:
       - name: Enable ingress
         run: minikube addons enable ingress && minikube addons enable ingress-dns
 
-      - name: ExportIP
+      - name: Export IP
         run: echo "CLUSTER_DOMAIN=$(minikube ip)" >> $GITHUB_ENV
 
-      - name: Enable ingress
+      - name: Show IP
         run: echo $CLUSTER_DOMAIN
 
       - name: Create namespace
@@ -60,7 +54,6 @@ jobs:
         shell: bash
         run: |
           cd ./install/
-          ./000-install-dependency-operators.sh $TARGET_NAMESPACE
           ./001-deploy-prometheus.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN
           ./002-deploy-console-kafka.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN zk
           
