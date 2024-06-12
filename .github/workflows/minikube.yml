@@ -7,12 +7,16 @@ jobs:
   test_pr:
     runs-on: ubuntu-latest
     steps:
+
       - name: Start minikube
         id: minikube
         uses: medyagh/setup-minikube@latest
         with:
           cpus: 4
           memory: 4096m
+
+      - name: Create namespace
+        run: kubectl create namespace console-namespace
 
       - name: Install Strimzi
         run: kubectl create -f 'https://strimzi.io/install/latest?namespace=console-namespace' --namespace=console-namespace
