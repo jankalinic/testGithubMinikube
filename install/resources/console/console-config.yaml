@@ -1,13 +1,13 @@
 kafka:
   clusters:
     - name: console-kafka
-      namespace: ${NAMESPACE}
-      listener: ${NAMESPACE}
+      namespace: "${NAMESPACE}"
+      listener: secure
       properties:
         security.protocol: SASL_SSL
         sasl.mechanism: SCRAM-SHA-512
-        bootstrap.servers: my-kafka1.cloud.example.com:9093
-        sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="kafka1-user" password="sCr@m!";
+        bootstrap.servers: "${BOOTSTRAP_DOMAIN}"
+        sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="console-kafka-user1" password="${KAFKA_USER_PASSWORD}";
       adminProperties: {}
       consumerProperties: {}
       producerProperties: {}
