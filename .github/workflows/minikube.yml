@@ -12,12 +12,7 @@ jobs:
         uses: medyagh/setup-minikube@latest
         with:
           cpus: 4
-          memory: 4000m
-      - name: Check memory
-        run: minikube config get memory
-
-      - name: Check cpu
-        run: minikube config get cpus
+          memory: 4096m
 
       - name: Install Strimzi
         run: kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n console-namespace
