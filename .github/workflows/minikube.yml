@@ -4,7 +4,7 @@ on:
       - main
 
 jobs:
-  label_issue:
+  test_pr:
     runs-on: ubuntu-latest
     steps:
       - name: Start minikube
