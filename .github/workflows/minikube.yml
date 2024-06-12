@@ -7,13 +7,23 @@ jobs:
   label_issue:
     runs-on: ubuntu-latest
     steps:
-      - name: start minikube
+      - name: Start minikube
         id: minikube
         uses: medyagh/setup-minikube@latest
         with:
           cpus: 4
           memory: 4000m
-      - name: check memory
+      - name: Check memory
         run: minikube config get memory
-      - name: check cpu
+
+      - name: Check cpu
         run: minikube config get cpus
+
+      - name: Install Strimzi
+        run: kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n console-namespace
+
+      - name: Create Kafka
+        run: kubectl apply -f https://strimzi.io/examples/latest/kafka/kraft/kafka-single-node.yaml -n console-namespace
+
+      - name: Wait for Kafka
+        run: kubectl wait kafka/my-cluster --for=condition=Ready --timeout=300s -n console-namespace
