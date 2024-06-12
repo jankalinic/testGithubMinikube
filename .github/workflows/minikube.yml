@@ -93,9 +93,10 @@ jobs:
       - name: Console deployment
         shell: bash
         run: | 
-            sed -i 's#$USER_PASSWORD#"$(kubectl get secret console-user -o yaml | yq '.data.password' - | base64 --decode)"#g' $CONFIG_YAML
-            sed -i 's#$CLUSTER_DOMAIN#"$TARGET_NAMESPACE"#g' $CONFIG_YAML
-            sed -i 's#$NAMESPACE#"$CLUSTER_DOMAIN"#g' $CONFIG_YAML
+            PASSWORD=$(kubectl get secret console-user -o yaml | yq '.data.password' - | base64 --decode)
+            sed -i 's#$USER_PASSWORD#"${PASSWORD}"#g' $CONFIG_YAML
+            sed -i 's#$CLUSTER_DOMAIN#${CLUSTER_DOMAIN}#g' $CONFIG_YAML
+            sed -i 's#$NAMESPACE#${TARGET_NAMESPACE}#g' $CONFIG_YAML
             cat $CONFIG_YAML
             ./install/003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN $CONFIG_YAML
 
