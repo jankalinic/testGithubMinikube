@@ -50,7 +50,7 @@ jobs:
         run: kubectl get pods -n $TARGET_NAMESPACE
 
       - name: Prometheus Operator deployment
-        run: "curl -s https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml | sed 's/namespace: default/namespace: $TARGET_NAMESPACE/' | kubectl create -f -n -"
+        run: "curl -s https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml | sed 's/namespace: default/namespace: $TARGET_NAMESPACE/' | kubectl create -n $TARGET_NAMESPACE -f -"
 
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
