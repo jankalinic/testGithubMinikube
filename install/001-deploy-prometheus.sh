@@ -11,7 +11,6 @@ source ${CONSOLE_INSTALL_PATH}/_common.sh
 
 if ! ${KUBE} get crd prometheuses.monitoring.coreos.com >/dev/null ; then
     echo -e "${ERROR} Prometheus Operator custom resource(s) not found"
-    display_suggested_subscription "prometheus-operator" "prometheus"
     exit 1
 fi
 
