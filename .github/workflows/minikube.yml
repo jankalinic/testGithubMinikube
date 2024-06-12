@@ -36,10 +36,10 @@ jobs:
         run: kubectl create namespace $TARGET_NAMESPACE
 
       - name: Install Strimzi
-        run: kubectl create -f 'https://strimzi.io/install/latest?namespace=$TARGET_NAMESPACE' --namespace=$TARGET_NAMESPACE
+        run: kubectl create -f 'https://strimzi.io/install/latest?namespace='$TARGET_NAMESPACE -n $TARGET_NAMESPACE
 
       - name: Show pods
-        run: kubectl get pods --namespace=$TARGET_NAMESPACE
+        run: kubectl get pods -n $TARGET_NAMESPACE
 
       - name: Console installation
         shell: bash
@@ -51,7 +51,7 @@ jobs:
           ./003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN $CONSOLE_CONFIG
 
       - name: Wait for Kafka
-        run: kubectl wait kafka/my-cluster --for=condition=Ready --timeout=300s --namespace=$TARGET_NAMESPACE
+        run: kubectl wait kafka/my-cluster --for=condition=Ready --timeout=300s -n $TARGET_NAMESPACE
 
       - name: Show pods
-        run: kubectl get pods --namespace=$TARGET_NAMESPACE
+        run: kubectl get pods -n $TARGET_NAMESPACE
