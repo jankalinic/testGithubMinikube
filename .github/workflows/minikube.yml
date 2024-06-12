@@ -1,4 +1,4 @@
-name: Greeting on variable day
+name: Pull Request Minikube
 
 on:
   pull_request:
@@ -93,10 +93,6 @@ jobs:
       - name: Wait for user secret
         run: while ! kubectl get secret console-kafka-user1 -n $TARGET_NAMESPACE; do echo "Waiting for user secret"; sleep 5; done
 
-      - name: build images
-        run: make container-images
-
-
       - name: Console deployment
         shell: bash
         run: | 
@@ -110,3 +106,6 @@ jobs:
 
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
+
+      - name: build images
+        run: make container-images
