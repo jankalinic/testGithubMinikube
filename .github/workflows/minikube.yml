@@ -6,7 +6,6 @@ on:
       - main
 
 env:
-  INSTALL_DIR: "./install/"
   TARGET_NAMESPACE: console-namespace
 
 jobs:
@@ -39,10 +38,16 @@ jobs:
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
 
+      - name: Show dir
+        run: pwd
+
+      - name: Show files
+        run: ls
+
       - name: Console installation
         shell: bash
         run: |
-          cd $INSTALL_DIR
+          cd ./install/
           ./000-install-dependency-operators.sh $TARGET_NAMESPACE
           ./001-deploy-prometheus.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN
           ./002-deploy-console-kafka.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN zk

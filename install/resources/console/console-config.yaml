@@ -6,7 +6,7 @@ kafka:
       properties:
         security.protocol: SASL_SSL
         sasl.mechanism: SCRAM-SHA-512
-        bootstrap.servers: "${BOOTSTRAP_DOMAIN}"
+        bootstrap.servers: bootstrap."${BOOTSTRAP_DOMAIN}"
         sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="console-kafka-user1" password="${KAFKA_USER_PASSWORD}";
       adminProperties: {}
       consumerProperties: {}
