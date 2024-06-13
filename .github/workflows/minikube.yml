@@ -38,7 +38,7 @@ jobs:
         run: kubectl create namespace $TARGET_NAMESPACE
 
       - name: Install Strimzi
-        run: kubectl create -f "https://strimzi.io/install/latest?namespace="$TARGET_NAMESPACE -n $TARGET_NAMESPACE
+        run: kubectl create -f "https://strimzi.io/install/latest?namespace=$TARGET_NAMESPACE" -n $TARGET_NAMESPACE
 
       - name: Wait For Strimzi
         run: kubectl wait deployment/strimzi-cluster-operator --for=condition=available --timeout=180s -n $TARGET_NAMESPACE
@@ -84,9 +84,16 @@ jobs:
       - name: Show services
         run: kubectl get services -n $TARGET_NAMESPACE
 
-      - name: Sleep
-        run: sleep 20
+      - name: Wait For Console
+        run: kubectl wait deployment/console --for=condition=available --timeout=180s -n $TARGET_NAMESPACE
 
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
 
+      - name: Add Hosts Entry
+        shell: bash
+        run: |
+          echo "192.168.49.2 console-ui.${CLUSTER_DOMAIN}" | sudo tee -a /etc/hosts
+
+      - name: Test Curl
+        run: curl -i "http://console-ui.${CLUSTER_DOMAIN}.dev:80"
