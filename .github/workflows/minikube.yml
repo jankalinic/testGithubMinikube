@@ -96,5 +96,5 @@ jobs:
 
       - name: Test Curl
         run: |
-          curl -i "http://console-ui.${CLUSTER_DOMAIN}.dev:80"
-          curl --resolve "console-ui.${CLUSTER_DOMAIN}.dev:80:192.168.49.2" -i "http://console-ui.${CLUSTER_DOMAIN}.dev:80"
+          curl -i "http://console-ui.${CLUSTER_DOMAIN}:80"
+          curl --resolve "console-ui.${CLUSTER_DOMAIN}:80:192.168.49.2" -i "http://console-ui.${CLUSTER_DOMAIN}:80"
