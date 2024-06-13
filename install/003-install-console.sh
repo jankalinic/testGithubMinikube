@@ -49,15 +49,14 @@ fi
 
 if [ "$(${KUBE} api-resources --api-group=route.openshift.io -o=name)" != "" ] ; then
     ${KUBE} apply -n ${NAMESPACE} -f ${RESOURCE_PATH}/console/console-ui.route.yaml
-    CONSOLE_HOSTNAME=$(${KUBE} get route console-ui-route -n ${NAMESPACE} -o jsonpath='{.spec.host}')
+    export CONSOLE_HOSTNAME=$(${KUBE} get route console-ui-route -n ${NAMESPACE} -o jsonpath='{.spec.host}')
 else
-    CONSOLE_HOSTNAME="console-ui.${CLUSTER_DOMAIN}"
+    export CONSOLE_HOSTNAME="console-ui.${CLUSTER_DOMAIN}"
     echo "$(${YQ} '.spec.rules[0].host = strenv(CONSOLE_HOSTNAME)' ${RESOURCE_PATH}/console/console-ui.ingress.yaml)"
     ${YQ} '.spec.rules[0].host = strenv(CONSOLE_HOSTNAME)' ${RESOURCE_PATH}/console/console-ui.ingress.yaml | ${KUBE} apply -n ${NAMESPACE} -f -
 fi
 
 # Replace env variables
-export CONSOLE_HOSTNAME
 ${YQ} '(.. | select(tag == "!!str")) |= envsubst(ne)' ${RESOURCE_PATH}/console/console.deployment.yaml | ${KUBE} apply -n ${NAMESPACE} -f -
 
 echo -e "${INFO} Console deployed and available at https://${CONSOLE_HOSTNAME}"

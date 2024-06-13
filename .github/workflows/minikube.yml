@@ -40,54 +40,27 @@ jobs:
       - name: Install Strimzi
         run: kubectl create -f "https://strimzi.io/install/latest?namespace="$TARGET_NAMESPACE -n $TARGET_NAMESPACE
 
-      - name: Wait for Strimzi
+      - name: Wait For Strimzi
         run: kubectl wait deployment/strimzi-cluster-operator --for=condition=available --timeout=180s -n $TARGET_NAMESPACE
 
-      - name: Show pods
-        run: kubectl get pods -n $TARGET_NAMESPACE
-
-      - name: Prometheus Operator deployment
+      - name: Prometheus Operator Deployment
         shell: bash
         run: |
           curl -s "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml" | sed "s#namespace: default#namespace: ${TARGET_NAMESPACE}#g" | kubectl create -n $TARGET_NAMESPACE -f -
 
-      - name: Show pods
-        run: kubectl get pods -n $TARGET_NAMESPACE
-
-      - name: Show deployments
-        run: kubectl get deployments -n $TARGET_NAMESPACE
-
-      - name: Prometheus deployment
+      - name: Prometheus Instance Deployment
         shell: bash
         run: ./install/001-deploy-prometheus.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN
 
-      - name: Show pods
-        run: kubectl get pods -n $TARGET_NAMESPACE
-
-      - name: Show deployments
-        run: kubectl get deployments -n $TARGET_NAMESPACE
-
-      - name: Kafka deployment
+      - name: Kafka Cluster Deployment
         shell: bash
         run: ./install/002-deploy-console-kafka.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN zk
-
-      - name: Sleep
-        run: sleep 20
-
-      - name: Show pods
-        run: kubectl get pods -n $TARGET_NAMESPACE
-
-      - name: Show deployments
-        run: kubectl get deployments -n $TARGET_NAMESPACE
 
       - name: Wait for Kafka
         run: kubectl wait kafka/console-kafka --for=condition=Ready --timeout=300s -n $TARGET_NAMESPACE
 
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
-
-      - name: Show deployments
-        run: kubectl get deployments -n $TARGET_NAMESPACE
 
       - name: Wait for user secret
         run: while ! kubectl get secret console-kafka-user1 -n $TARGET_NAMESPACE; do echo "Waiting for user secret"; sleep 5; done
@@ -101,7 +74,7 @@ jobs:
         run: | 
             USERPS=$(kubectl get secret console-kafka-user1 -n $TARGET_NAMESPACE -o yaml | yq '.data.password' - | base64 --decode)
             echo -e "ps = ${USERPS}"
-            sed -i -e "s#\$USER_PASSWORD#\"${USERPS}\"#g" -e "s#\$CLUSTER_DOMAIN#${CLUSTER_DOMAIN}#g" -e "s#\$NAMESPACE#${TARGET_NAMESPACE}#g" $CONFIG_YAML
+            sed -i -e "s#\$USER_PASSWORD#${USERPS}#g" -e "s#\$CLUSTER_DOMAIN#${CLUSTER_DOMAIN}#g" -e "s#\$NAMESPACE#${TARGET_NAMESPACE}#g" $CONFIG_YAML
             cat $CONFIG_YAML
             ./install/003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN $CONFIG_YAML
 
