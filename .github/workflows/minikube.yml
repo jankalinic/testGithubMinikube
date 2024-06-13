@@ -9,6 +9,7 @@ env:
   TARGET_NAMESPACE: console-namespace
   CI_CLUSTER: true
   CONFIG_YAML: ./install/resources/console/console-config.yaml
+  CLUSTER_DOMAIN: "192.168.49.2"
 jobs:
   test_pr:
     runs-on: ubuntu-latest
@@ -31,17 +32,11 @@ jobs:
       - name: Enable ingress
         run: minikube addons enable ingress && minikube addons enable ingress-dns
 
-      - name: Export IP
-        run: echo "CLUSTER_DOMAIN=$(minikube ip)" >> $GITHUB_ENV
-
-      - name: Show IP
-        run: echo $CLUSTER_DOMAIN
-
       - name: Create namespace
         run: kubectl create namespace $TARGET_NAMESPACE
 
       - name: Install Strimzi
-        run: kubectl create -f https://strimzi.io/install/latest?namespace=$TARGET_NAMESPACE -n $TARGET_NAMESPACE
+        run: kubectl create -f "https://strimzi.io/install/latest?namespace="$TARGET_NAMESPACE -n $TARGET_NAMESPACE
 
       - name: Wait for Strimzi
         run: kubectl wait deployment/strimzi-cluster-operator --for=condition=available --timeout=180s -n $TARGET_NAMESPACE
@@ -100,14 +95,19 @@ jobs:
         run: | 
             USERPS=$(kubectl get secret console-kafka-user1 -n $TARGET_NAMESPACE -o yaml | yq '.data.password' - | base64 --decode)
             echo ${USERPS}
-            sed -i "s#\$USER_PASSWORD#\"${USERPS}\"#g" $CONFIG_YAML
-            sed -i "s#\$CLUSTER_DOMAIN#${CLUSTER_DOMAIN}#g" $CONFIG_YAML
-            sed -i "s#\$NAMESPACE#${TARGET_NAMESPACE}#g" $CONFIG_YAML
+            sed -i -e "s#\$USER_PASSWORD#\"${USERPS}\"#g" -e "s#\$CLUSTER_DOMAIN#${CLUSTER_DOMAIN}#g" -e "s#\$NAMESPACE#${TARGET_NAMESPACE}#g" $CONFIG_YAML
             cat $CONFIG_YAML
             ./install/003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN $CONFIG_YAML
+
+      - name: Sleep
+        run: sleep 20
 
       - name: Show pods
         run: kubectl get pods -n $TARGET_NAMESPACE
 
-      - name: build images
-        run: make container-images
+      - name: test ingress
+        run: curl --resolve "hello-world.example:80:"$(minikube ip) -i http://console-ui.example
+
+#     Build images and run deployment
+#      - name: build images
+#        run: make container-images
