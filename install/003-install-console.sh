@@ -52,6 +52,7 @@ if [ "$(${KUBE} api-resources --api-group=route.openshift.io -o=name)" != "" ] ;
     CONSOLE_HOSTNAME=$(${KUBE} get route console-ui-route -n ${NAMESPACE} -o jsonpath='{.spec.host}')
 else
     CONSOLE_HOSTNAME="console-ui.${CLUSTER_DOMAIN}"
+    echo "$(${YQ} '.spec.rules[0].host = strenv(CONSOLE_HOSTNAME)' ${RESOURCE_PATH}/console/console-ui.ingress.yaml)"
     ${YQ} '.spec.rules[0].host = strenv(CONSOLE_HOSTNAME)' ${RESOURCE_PATH}/console/console-ui.ingress.yaml | ${KUBE} apply -n ${NAMESPACE} -f -
 fi
 
