@@ -12,7 +12,7 @@ spec:
       port:
         number: 80
   rules:
-    - host: ${CONSOLE_HOSTNAME}
+    - host: "${CONSOLE_HOSTNAME}"
       http:
         paths:
           - pathType: ImplementationSpecific
@@ -21,3 +21,4 @@ spec:
                 name: console-ui
                 port:
                   number: 80
+
