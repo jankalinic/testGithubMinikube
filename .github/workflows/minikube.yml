@@ -73,9 +73,7 @@ jobs:
         shell: bash
         run: | 
             USERPS=$(kubectl get secret console-kafka-user1 -n $TARGET_NAMESPACE -o yaml | yq '.data.password' - | base64 --decode)
-            echo -e "ps = ${USERPS}"
             sed -i -e "s#\$USER_PASSWORD#${USERPS}#g" -e "s#\$CLUSTER_DOMAIN#${CLUSTER_DOMAIN}#g" -e "s#\$NAMESPACE#${TARGET_NAMESPACE}#g" $CONFIG_YAML
-            cat $CONFIG_YAML
             ./install/003-install-console.sh $TARGET_NAMESPACE $CLUSTER_DOMAIN $CONFIG_YAML
 
       - name: Show ingress
@@ -94,6 +92,9 @@ jobs:
         shell: bash
         run: |
           echo "192.168.49.2 console-ui.${CLUSTER_DOMAIN}" | sudo tee -a /etc/hosts
+          cat /etc/hosts
 
       - name: Test Curl
-        run: curl -i "http://console-ui.${CLUSTER_DOMAIN}.dev:80"
+        run: |
+          curl -i "http://console-ui.${CLUSTER_DOMAIN}.dev:80"
+          curl --resolve "console-ui.${CLUSTER_DOMAIN}.dev:80:192.168.49.2" -i "http://console-ui.${CLUSTER_DOMAIN}.dev:80"
