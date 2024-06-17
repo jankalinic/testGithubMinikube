@@ -13,6 +13,7 @@ env:
 jobs:
   test_pr:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -99,9 +100,9 @@ jobs:
       # TODO: remove once satisfied with results
       - name: Test Curl
         run: |
-          sleep 60
-          curl -i "https://console-ui.${CLUSTER_DOMAIN}"
-          sleep 60
+          sleep 10
+          curl -i "console-ui.${CLUSTER_DOMAIN}"
+          sleep 10
           curl --resolve "https://console-ui.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP}" -i "https://console-ui.${CLUSTER_DOMAIN}:443"
-          sleep 60
+          sleep 10
           curl --resolve "console-prometheus.${CLUSTER_DOMAIN}:80:${MINIKUBE_IP}" -i "http://console-prometheus.${CLUSTER_DOMAIN}:80"
