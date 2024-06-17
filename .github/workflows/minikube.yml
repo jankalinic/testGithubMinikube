@@ -34,6 +34,9 @@ jobs:
           minikube addons enable ingress
           minikube addons enable ingress-dns
 
+      - name: Export Minikube IP
+        run: echo "MINIKUBE_IP=$(minikube ip)" >> $GITHUB_ENV
+
       - name: Create namespace
         run: kubectl create namespace $TARGET_NAMESPACE
 
@@ -64,7 +67,7 @@ jobs:
 
       - name: Wait for user secret
         run: while ! kubectl get secret console-kafka-user1 -n $TARGET_NAMESPACE; do echo "Waiting for user secret"; sleep 5; done
-
+      # TODO: requires images on streamshub - just like in examples
 #     Build images and run deployment
 #      - name: build images
 #        run: make container-images
@@ -91,14 +94,14 @@ jobs:
       - name: Add Hosts Entry
         shell: bash
         run: |
-          echo "192.168.49.2 console-ui.${CLUSTER_DOMAIN}" | sudo tee -a /etc/hosts
-          cat /etc/hosts
+          echo "${MINIKUBE_IP} console-ui.${CLUSTER_DOMAIN}" | sudo tee -a /etc/hosts
 
+      # TODO: remove once satisfied with results
       - name: Test Curl
         run: |
           sleep 60
-          curl -i "http://console-ui.${CLUSTER_DOMAIN}:80"
+          curl -i "https://console-ui.${CLUSTER_DOMAIN}"
           sleep 60
-          curl --resolve "http://console-ui.${CLUSTER_DOMAIN}:80:192.168.49.2" -i "http://console-ui.${CLUSTER_DOMAIN}:80"
+          curl --resolve "https://console-ui.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP}" -i "https://console-ui.${CLUSTER_DOMAIN}:443"
           sleep 60
-          curl --resolve "https://console-prometheus.${CLUSTER_DOMAIN}:80:192.168.49.2" -i "https://console-prometheus.${CLUSTER_DOMAIN}:80"
+          curl --resolve "console-prometheus.${CLUSTER_DOMAIN}:80:${MINIKUBE_IP}" -i "http://console-prometheus.${CLUSTER_DOMAIN}:80"
