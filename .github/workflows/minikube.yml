@@ -97,8 +97,8 @@ jobs:
       - name: Test Curl
         run: |
           sleep 60
-          curl -i "http://console-ui.${CLUSTER_DOMAIN}:80"
+          curl -i "https://console-ui.${CLUSTER_DOMAIN}:80"
           sleep 60
-          curl --resolve "console-ui.${CLUSTER_DOMAIN}:80:192.168.49.2" -i "http://console-ui.${CLUSTER_DOMAIN}:80"
+          curl --resolve "https://console-ui.${CLUSTER_DOMAIN}:80:192.168.49.2" -i "https://console-ui.${CLUSTER_DOMAIN}:80"
           sleep 60
-          curl --resolve "console-prometheus.${CLUSTER_DOMAIN}:80:192.168.49.2" -i "http://console-prometheus.${CLUSTER_DOMAIN}:80"
+          curl --resolve "https://console-prometheus.${CLUSTER_DOMAIN}:80:192.168.49.2" -i "https://console-prometheus.${CLUSTER_DOMAIN}:80"
